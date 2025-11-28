@@ -2,9 +2,13 @@
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="dark">
     <head>
         @include('partials.head')
+            @vite('resources/css/app.css')
+    @vite('resources/js/app.js')
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+
     </head>
-    <body class="min-h-screen bg-white dark:bg-zinc-800">
-        <flux:header container class="border-b border-zinc-200 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900">
+    <body class="min-h-screen bg-white dark:bg-gray-800">
+        <flux:header container class="border-b border-zinc-200 bg-zinc-50 dark:border-zinc-700 dark:bg-gray-800">
             <flux:sidebar.toggle class="lg:hidden" icon="bars-2" inset="left" />
 
             <a href="{{ route('dashboard') }}" class="ms-2 me-5 flex items-center space-x-2 rtl:space-x-reverse lg:ms-0" wire:navigate>
@@ -120,5 +124,30 @@
         {{ $slot }}
 
         @fluxScripts
+        <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+        <script>
+document.addEventListener('livewire:load', function () {
+
+    function initSelect2() {
+        $('.select2payer').select2({
+            width: '100%',
+            dropdownParent: $('#paymentModal') // VERY IMPORTANT for modal
+        });
+
+        $('.select2payer').on('change', function () {
+            let value = $(this).val();
+            @this.set('payerId', value);
+        });
+    }
+
+    // Refresh Select2 every time Livewire updates DOM
+    Livewire.hook('message.processed', (message, component) => {
+        initSelect2();
+    });
+
+    initSelect2();
+});
+</script>
     </body>
 </html>

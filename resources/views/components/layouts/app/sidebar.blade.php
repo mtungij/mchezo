@@ -3,8 +3,8 @@
     <head>
         @include('partials.head')
     </head>
-    <body class="min-h-screen bg-white dark:bg-zinc-800">
-        <flux:sidebar sticky stashable class="border-e border-zinc-200 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900">
+    <body class="min-h-screen bg-white dark:bg-gray-900">
+        <flux:sidebar sticky stashable class="border-e border-zinc-200 bg-zinc-50 dark:border-zinc-700 dark:bg-gray-800">
             <flux:sidebar.toggle class="lg:hidden" icon="x-mark" />
 
             <a href="{{ route('dashboard') }}" class="me-5 flex items-center space-x-2 rtl:space-x-reverse" wire:navigate>
@@ -18,17 +18,43 @@
             </flux:navlist>
 
 
- <flux:sidebar.item icon="home" href="{{ route('dashboard') }}">Dashboard</flux:sidebar.item>
-<flux:sidebar.item icon="document-text" href="{{ route('groups.index') }}">Groups</flux:sidebar.item>
+
+{{-- <flux:sidebar.item icon="document-text" href="{{ route('groups.index') }}">Groups</flux:sidebar.item> --}}
+
+<flux:sidebar.group 
+    heading="Groups"
+    expandable
+    :expanded="false"
+    class="space-y-1"
+>
+    <flux:sidebar.item 
+        href="{{ route('groups.create') }}" 
+        class="hover:bg-cyan-50 hover:text-cyan-600 rounded-lg"
+    >
+        Create Groups Name
+    </flux:sidebar.item>
+
+    <flux:sidebar.item 
+        href="{{ route('groups.index') }}" 
+        class="hover:bg-cyan-50 hover:text-cyan-600 rounded-lg"
+    >
+        Groups list
+    </flux:sidebar.item>
+
+    <flux:sidebar.item 
+        href="#" 
+        class="hover:bg-cyan-50 hover:text-cyan-600 rounded-lg"
+    >
+        Brand guidelines
+    </flux:sidebar.item>
+</flux:sidebar.group>
 
 
-<flux:sidebar.item icon="document-text" href="{{ route('groups.index') }}">
-    Groups
-</flux:sidebar.item>
+
 
 
             <flux:spacer />
-
+{{-- 
             <flux:navlist variant="outline">
                 <flux:navlist.item icon="folder-git-2" href="https://github.com/laravel/livewire-starter-kit" target="_blank">
                 {{ __('Repository') }}
@@ -37,7 +63,7 @@
                 <flux:navlist.item icon="book-open-text" href="https://laravel.com/docs/starter-kits#livewire" target="_blank">
                 {{ __('Documentation') }}
                 </flux:navlist.item>
-            </flux:navlist>
+            </flux:navlist> --}}
 
             <!-- Desktop User Menu -->
             <flux:dropdown class="hidden lg:block" position="bottom" align="start">
@@ -138,5 +164,16 @@
         {{ $slot }}
 
         @fluxScripts
+        <script src="https://preline.co/assets/js/hs-ui.bundle.js"></script>
+
     </body>
+
 </html>
+
+
+
+
+
+
+
+
