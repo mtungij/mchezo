@@ -44,7 +44,7 @@ class GroupWithFakeMembersSeeder extends Seeder
             $user = User::create([
                 'name' => 'Fake User '.$i,
                 'phone' => '25570000'.str_pad($i, 2, '0', STR_PAD_LEFT),
-                'email' => 'fakeuser'.$i.'@exple.com',
+                'email' => 'fakeuser'.$i.'@jamxple.com',
                 'passport' => 'fake_passport_'.$i.'.jpg', // placeholder
                 'password' => Hash::make(Str::random(8)),
                 'login_code' => strtoupper(Str::random(4)),

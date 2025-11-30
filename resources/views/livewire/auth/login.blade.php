@@ -1,5 +1,10 @@
 <x-layouts.auth>
-    <div class="flex flex-col gap-8 w-full max-w-md sm:max-w-lg md:max-w-xl lg:max-w-2xl mx-auto p-4 sm:p-6 md:p-8 bg-white dark:bg-gray-900 rounded-lg shadow-md">
+
+
+    <div class="w-full max-w-sm sm:max-w-md mx-auto bg-white rounded-lg shadow dark:border mt-4 p-4 dark:bg-gray-800 dark:border-gray-700">
+        
+
+
 
         <!-- Header -->
         <x-auth-header 
@@ -87,4 +92,7 @@
             </div>
         @endif
     </div>
+
+
+    
 </x-layouts.auth>

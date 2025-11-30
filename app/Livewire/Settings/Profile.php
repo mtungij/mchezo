@@ -14,6 +14,9 @@ class Profile extends Component
 
     public string $email = '';
 
+
+    public string $phone = '';
+
     /**
      * Mount the component.
      */
@@ -21,6 +24,7 @@ class Profile extends Component
     {
         $this->name = Auth::user()->name;
         $this->email = Auth::user()->email;
+        $this->phone = Auth::user()->phone;
     }
 
     /**
@@ -33,6 +37,7 @@ class Profile extends Component
         $validated = $this->validate([
             'name' => ['required', 'string', 'max:255'],
 
+
             'email' => [
                 'required',
                 'string',
@@ -41,6 +46,7 @@ class Profile extends Component
                 'max:255',
                 Rule::unique(User::class)->ignore($user->id),
             ],
+            'phone'=> ['required','string','max:255'],
         ]);
 
         $user->fill($validated);

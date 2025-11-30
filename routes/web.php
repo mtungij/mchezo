@@ -4,20 +4,26 @@ use App\Livewire\Settings\Appearance;
 use App\Livewire\Settings\Password;
 use App\Livewire\Settings\Profile;
 use App\Livewire\Settings\TwoFactor;
+use GrahamCampbell\ResultType\Success;
 use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
 use App\Livewire\Groups\CreateGroup;
 use App\Livewire\RegisterThroughInvite;
 use App\Livewire\Groups\ViewMembers;
 use App\Livewire\Groups\GroupsIndex;
+use App\Livewire\SuccessMessage;
 
 Route::get('/', function () {
-    return view('welcome');
+    return redirect()->route('login');
 })->name('home');
 
 Route::view('dashboard', 'dashboard')
     ->middleware(['auth', 'verified'])
     ->name('dashboard');
+
+Route::get('/invite/{code}', RegisterThroughInvite::class)->name('invite.register');
+Route::get('/registration-success/{user}/{group}', [SuccessMessage::class, 'success'])->name('registration.success');
+
 
 Route::middleware(['auth'])->group(function () {
     Route::redirect('settings', 'settings/profile');
@@ -25,7 +31,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('settings/profile', Profile::class)->name('profile.edit');
     Route::get('settings/password', Password::class)->name('user-password.edit');
     Route::get('settings/appearance', Appearance::class)->name('appearance.edit');
-Route::get('/invite/{code}', RegisterThroughInvite::class)->name('invite.register');
+
+
     
 Route::get('/groups/{group}/members', ViewMembers::class)->name('groups.members');
 

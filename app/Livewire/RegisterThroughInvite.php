@@ -32,7 +32,7 @@ class RegisterThroughInvite extends Component
     protected $rules = [
         'name' => 'required|string|min:3',
         'phone' => 'required|string|min:9',
-         'passport' => 'required|image|max:1024', // max 1MB
+         'passport' => 'nullable|image', // max 1MB
     ];
 
  public function register()
@@ -42,13 +42,16 @@ class RegisterThroughInvite extends Component
     // Format phone
     $formattedPhone = $this->formatPhone($this->phone);
 
-    $passportPath = $this->passport->store('passports', 'public');
+       if ($this->passport) {
+        $passportPath = $this->passport->store('passports', 'public');
+    }
 
     $user = User::create([
         'name' => $this->name,
         'phone' => $formattedPhone,
         'email' => $formattedPhone.'@example.com',
-        'passport' => $passportPath,
+        'role'=>"member",
+          'passport' => $passportPath ?? null,
         'password' => Hash::make(Str::random(8)),
         'login_code' => strtoupper(Str::random(4)),
     ]);
@@ -61,21 +64,24 @@ class RegisterThroughInvite extends Component
         'order_position' => $order,
     ]);
 $phone = $user->phone;
+
+
      $massage = "Ndugu {$user->name}, umejisajili kwenye kikundi cha {$this->group->name}. "
          . "Code yako ya kuingia ni: {$user->login_code}. "
-         . "Kiasi cha mchango ni Tsh {$this->group->contribution_amount}. "
-         . "Malipo yanapaswa kufanyika kabla ya tarehe {$this->group->payment_due_date}. "
-         . "Ingia kwenye mfumo kupitia {$this->group->login_url}. "
+         . "Kiasi cha kuchangia ni Tsh ".number_format($this->group->contribution_amount, ).". "
          . "Itunze code yako usishare na mtu yoyote.";
 
 
     // Send SMS
     $this->sendsms($phone, $massage);
 
-    session()->flash('success', "Registration successful! Your login code: ".$user->login_code);
+session()->flash('success', "Hongera, $this->name! Tayari umejisajili kwenye kikundi cha {$this->group->name}. Nambari yako ya kuingia: ".$user->login_code);
+
 
     $this->name = '';
     $this->phone = '';
+     $this->passport = '';
+
 }
 
 
@@ -86,17 +92,17 @@ $phone = $user->phone;
     $phone = trim($phone);
 
     // Kama inaanza na +255, rudisha bila kubadili
-    if (Str::startsWith($phone, '+255')) {
+    if (Str::startsWith($phone, '255')) {
         return $phone;
     }
 
     // Kama inaanza na 0 (mfano 0712...)
     if (Str::startsWith($phone, '0')) {
-        return '+255' . substr($phone, 1);
+        return '255' . substr($phone, 1);
     }
 
     // Kama mwanzo si 0 wala +255, assume ni 7xxxx au 6xxxx
-    return '+255' . $phone;
+    return '255' . $phone;
 }
 
 
@@ -119,7 +125,7 @@ public function sendsms($phone,$massage){
       'Content-Type: application/json',
     ]);
     curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode([
-      "phoneNumbers" => ["$phone"],
+      "phoneNumbers" => ["+$phone"],
       "message" => $massage
     ]));
   
@@ -133,5 +139,6 @@ public function sendsms($phone,$massage){
     public function render()
     {
         return view('livewire.groups.register-through-invite');
+        
     }
 }

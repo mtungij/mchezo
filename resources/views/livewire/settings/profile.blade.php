@@ -5,6 +5,9 @@
         <form wire:submit="updateProfileInformation" class="my-6 w-full space-y-6">
             <flux:input wire:model="name" :label="__('Name')" type="text" required autofocus autocomplete="name" />
 
+
+            <flux:input wire:model="phone" :label="__('Phone number')" type="number" required autofocus autocomplete="tel" />
+
             <div>
                 <flux:input wire:model="email" :label="__('Email')" type="email" required autocomplete="email" />
 

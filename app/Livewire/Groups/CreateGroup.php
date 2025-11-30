@@ -61,6 +61,12 @@ public $interval = 1;
         'order_position' => 1,
     ]);
 
+    $phone = auth()->user()->phone;
+
+    $massage = "umetengeneza kikundi kipya chenye jina {$this->name}.link ya kujiunga ni: " . url('/invite/' . $this->group->invite_code);
+
+    $this->sendsms($phone, $massage);
+
     session()->flash('success', 'Group created successfully! Invite link is ready.');
 }
 

@@ -1,254 +1,148 @@
 
       
         <div class="w-full">
-        <div class="-m-1.5 w-full">
-          <div class="p-1.5 w-full inline-block align-middle">
-            <div class="bg-white border border-gray-200 rounded-xl shadow-2xs overflow-hidden dark:bg-gray-800 dark:border-gray-700">
-              <!-- Header -->
-              <div class="px-6 py-4 grid gap-3 md:flex md:justify-between md:items-center border-b border-gray-200 dark:border-gray-700">
-                <div>
-                  <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-200">
-                    Users
-                  </h2>
-                  <p class="text-sm text-gray-600 dark:text-gray-400">
-                    Add Member, edit and more.
-                  </p>
-                </div>
-
-                <div>
-                  <div class="inline-flex gap-x-2">
-                    {{-- <a class="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-gray-200 bg-white text-gray-800 shadow-2xs hover:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none focus:outline-hidden focus:bg-gray-50 dark:bg-transparent dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800 dark:focus:bg-gray-800" href="#">
-                      View all me
-                    </a> --}}
-
-                    <a class="py-2 px-3 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-transparent bg-blue-600 text-white hover:bg-blue-700 focus:outline-hidden focus:bg-blue-700 disabled:opacity-50 disabled:pointer-events-none" href="#">
-                      <svg class="shrink-0 size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M5 12h14" />
-                        <path d="M12 5v14" />
-                      </svg>
-                      Add Member
-                    </a>
-                  </div>
-                </div>
+    <section class="bg-gray-50 py-8 antialiased dark:bg-gray-900 md:py-12">
+  <div class="mx-auto max-w-screen-xl px-4 2xl:px-0">
+    <!-- Heading & Filters -->
+    <div class="mb-4 items-end justify-between space-y-4 sm:flex sm:space-y-0 md:mb-8">
+      <div>
+        <nav class="flex" aria-label="Breadcrumb">
+          <ol class="inline-flex items-center space-x-1 md:space-x-2 rtl:space-x-reverse">
+            <li class="inline-flex items-center">
+              <a href="#" class="inline-flex items-center text-sm font-medium text-gray-700 hover:text-primary-600 dark:text-gray-400 dark:hover:text-white">
+              
+                Groups
+              </a>
+            </li>
+            <li>
+              <div class="flex items-center">
+                <svg class="h-5 w-5 text-gray-400 rtl:rotate-180" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+                  <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m9 5 7 7-7 7" />
+                </svg>
+                <a href="#" class="ms-1 text-sm font-medium text-gray-700 hover:text-primary-600 dark:text-gray-400 dark:hover:text-white md:ms-2">Group List</a>
               </div>
-              <!-- End Header -->
-
-              <!-- Table -->
-                @if($group->groupMembers->isEmpty())
-            <p class="text-gray-700 dark:text-gray-300">No members have joined yet.</p>
-        @else
-                <form wire:submit.prevent="saveOrder">
-              <table class="w-full divide-y divide-gray-200 dark:divide-gray-700">
-                <thead class="bg-gray-50 dark:bg-gray-800">
-                  <tr>
-                    
-
-                    <th scope="col" class="ps-6 lg:ps-3 xl:ps-0 pe-6 py-3 text-start">
-                      <div class="flex items-center gap-x-2">
-                        <span class="text-xs font-semibold uppercase text-gray-800 dark:text-gray-200">
-                          S/No
-                        </span>
-                      </div>
-                    </th>
-
-                    <th scope="col" class="px-6 py-3 text-start">
-                      <div class="flex items-center gap-x-2">
-                        <span class="text-xs font-semibold uppercase text-gray-800 dark:text-gray-200">
-                          Name
-                        </span>
-                      </div>
-                    </th>
-
-                    
-
-                    <th scope="col" class="px-6 py-3 text-start">
-                      <div class="flex items-center gap-x-2">
-                        <span class="text-xs font-semibold uppercase text-gray-800 dark:text-gray-200">
-                          Login Code
-                        </span>
-                      </div>
-                    </th>
-
-                    <th scope="col" class="px-6 py-3 text-start">
-                      <div class="flex items-center gap-x-2">
-                        <span class="text-xs font-semibold uppercase text-gray-800 dark:text-gray-200">
-                          Order Position
-                        </span>
-                      </div>
-                    </th>
-
-                    <th scope="col" class="px-6 py-3 text-start">
-                      <div class="flex items-center gap-x-2">
-                        <span class="text-xs font-semibold uppercase text-gray-800 dark:text-gray-200">
-                          Amount Due
-                        </span>
-                      </div>
-                    </th>
-
-
-                    <th scope="col" class="px-6 py-3 text-start">
-                      <div class="flex items-center gap-x-2">
-                        <span class="text-xs font-semibold uppercase text-gray-800 dark:text-gray-200">
-                          Amount Paid
-                        </span>
-                      </div>
-                    </th>
-
-                    <th scope="col" class="px-6 py-3 text-start">
-                      <div class="flex items-center gap-x-2">
-                        <span class="text-xs font-semibold uppercase text-gray-800 dark:text-gray-200">
-                          Status
-                        </span>
-                      </div>
-                    </th>
-
-                    <th scope="col" class="px-6 py-3 text-start">
-                      <div class="flex items-center gap-x-2">
-                        <span class="text-xs font-semibold uppercase text-gray-800 dark:text-gray-200">
-                          Payout Date
-                        </span>
-                      </div>
-                    </th>
-
-
-                    <th scope="col" class="px-6 py-3 text-start">
-                      <div class="flex items-center gap-x-2">
-                        <span class="text-xs font-semibold uppercase text-gray-800 dark:text-gray-200">
-                          Pay
-                        </span>
-                      </div>
-                    </th>
-
-                  
-
-                    <th scope="col" class="px-6 py-3 text-end"></th>
-                  </tr>
-                </thead>
-
-                <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
-               
-
-                       @foreach($this->getPayoutSchedule() as $member)
-
-                  <tr>
-                              <td class="size-px whitespace-nowrap">
-  <div class="ps-6 lg:ps-3 xl:ps-0 pe-6 py-3">
-    <div class="flex items-center gap-x-3">
-   
-      <div class="grow">
-        <span class="block text-sm font-semibold text-gray-800 dark:text-gray-200">{{ $member['order_position'] }}</span>
-
+            </li>
+           
+          </ol>
+        </nav>
+        <h2 class="mt-3 text-xl font-semibold text-gray-900 dark:text-white sm:text-2xl"> {{ $this->group->name }} Members</h2>
       </div>
+  
     </div>
-  </div>
-</td>
 
-                  <td class="size-px whitespace-nowrap">
-  <div class="ps-6 lg:ps-3 xl:ps-0 pe-6 py-3">
-    <div class="flex items-center gap-x-3">
-@if ($member['passport'])
-    <img src="{{ asset('storage/' . $member['passport']) }}"
-         class="w-10 h-10 rounded-full object-cover"
+
+<div class="flex flex-wrap items-center gap-3 mb-4">
+
+    <!-- Search Input -->
+  <!-- Only search -->
+<input type="text"
+       wire:model.live="search"
+       placeholder="Search name, phone, login code..."
+       class="w-full sm:w-full border rounded-lg p-2 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100">
+
+
+</div>
+
+
+
+<!-- CARD GRID -->
+
+  <div class="grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4">
+
+@foreach ($this->getPayoutSchedule() as $member)
+
+
+
+<div class="w-full">
+  <div class="flex flex-col md:flex-row md:justify-between md:items-start md:space-x-3">
+
+
+    <!-- Customer Card -->
+  <div class="w-full sm:w-full md:w-full lg:w-auto mb-4">
+
+
+     <div class="bg-white p-4 border-t-4 border-green-500 rounded-lg shadow-md w-full h-auto">
+
+    <div class="w-32 h-32 mx-auto rounded-full overflow-hidden border-4 border-green-400">
+    <img src="{{ $member['passport'] ? asset('storage/' . $member['passport']) : asset('assets/images/user.png') }}"
+         class="w-full h-full object-cover"
          alt="Passport">
-@else
-      <img src="{{ asset('assets/images/user.png') }}"
-         class="w-10 h-10 rounded-full object-cover"
-         alt="Passport">
-@endif
+</div>
+
+        <h1 class="text-green-600 font-bold text-xl text-center uppercase whitespace-nowrap overflow-hidden truncate">
+    {{ $member['name'] }}
+        </h1>
+        {{-- <h2 class="text-sm text-green-500 text-center font-semibold">memberToPay-?id</h2> --}}
+        <p class="text-center mt-2 text-gray-800 font-medium">{{ $member['phone'] }}</p>
+
+        {{-- <div class="mt-4 text-center">
+  <a href="" 
+     class="inline-flex items-center px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-semibold rounded-lg shadow-md transition-all">
+     📩 Tuma SMS ya Malipo
+  </a>
+</div> --}}
+
+     <div class="mt-4 text-center">
+  <a class="font-semibold {{ $member['is_paid'] ? 'inline-flex items-center px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-semibold rounded-lg shadow-md transition-all' : 'inline-flex items-center px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-semibold rounded-lg shadow-md transition-all' }}">
+                    {{ $member['is_paid'] ? 'Amechangiwa' : 'Bado Hajachangiwa' }}
+ </a>
+</div>
 
 
 
 
+
+
+        <ul class="mt-5 bg-gray-100 text-gray-700 divide-y divide-gray-300 rounded-lg shadow-sm text-sm">
+          <li class="flex items-center justify-between py-2 px-3">
+            <span class="font-bold text-base">Order Position</span>
+            <span class="px-3 py-1 rounded-full text-xs font-medium >Active</span>
+          </li>
+
+              
+
+          <li class="flex items-center justify-between py-2 px-3 font-bold text-base"><span></span><span>{{ $member['order_position'] }}</span></li>
+          <li class="flex items-center justify-between py-2 px-3 font-bold text-base"><span>Login Code</span><span>{{ $member['login_code'] }}</span></li>
+          <li class="flex items-center justify-between py-2 px-3 font-bold text-base"><span>Amount Due</span><span>  {{ number_format($member['amount_due'], 2) }}</span></li>
+            <li class="flex items-center justify-between py-2 px-3 font-bold text-base"><span>Amount Paid</span><span>{{ number_format($member['amount_paid'], 2) }}</span></li>
+      @php
+                $percent = $member['amount_due'] > 0
+                    ? ($member['amount_paid'] / $member['amount_due']) * 100
+                    : 0;
+            @endphp
+
+            <div class="mt-2">
+                <div class="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
+                    <div class="bg-green-500 h-2.5 rounded-full"
+                         style="width: {{ $percent }}%"></div>
+                </div>
+                <p class="text-xs mt-1 text-gray-600 dark:text-gray-300">
+                    {{ round($percent) }}% Paid
+                </p>
+            </div>
+            <li class="flex items-center justify-between py-2 px-3 font-bold text-base"><span>Tarehe Ya Kupewa</span><span>{{ $member['pay_date'] }}</span></li>
 
 
            
-      <div class="grow">
-<span class="block text-sm font-semibold text-gray-800 dark:text-gray-200 capitalize">
-    {{ $member['name'] }}
-</span>
-
-        <span class="block text-sm uppercase font-semibold text-gray-800 dark:text-gray-200">{{ $member['phone'] }}</span>
-      </div>
-    </div>
-  </div>
-</td>
-
-                    <td class="h-px w-72 whitespace-nowrap">
-                      <div class="px-6 py-3">
-                        <span class="block text-sm font-semibold text-gray-800 dark:text-gray-200">{{ $member['login_code'] }}</span>
+          <li class="flex items-center justify-between py-2 px-3 font-bold text-base"><span>Badilisha Mpangilio</span><span>
             
-                      </div>
-                    </td>
-                    <td class="size-px whitespace-nowrap">
-                      <div class="px-6 py-3">
-                              <input type="number"
-                           min="1"
-                           max="{{ $group->groupMembers->count() }}"
-                           wire:model.defer="membersOrder.{{ $member['id'] }}"
-                           class="w-16 border dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded p-1 text-center">
-                        </span>
-                      </div>
-                    </td>
-                    <td class="size-px whitespace-nowrap">
-                      <div class="px-6 py-3">
-                        <div class="flex items-center gap-x-3">
-                          <span class="block text-sm font-semibold text-gray-800 dark:text-gray-200">{{ number_format($member['amount_due'], 2) }}</span>
-                          <div class="flex w-full h-1.5 bg-gray-200 rounded-full overflow-hidden dark:bg-gray-700">
-                            <div class="flex flex-col justify-center overflow-hidden bg-gray-800 dark:bg-gray-200" role="progressbar" style="width: 78%" aria-valuenow="78" aria-valuemin="0" aria-valuemax="100"></div>
-                          </div>
-                        </div>
-                      </div>
-                    </td> 
-                    <td class="size-px whitespace-nowrap">
-                      <div class="px-6 py-3">
-                        <span class="block text-sm font-semibold text-gray-800 dark:text-gray-200"> {{ number_format($member['amount_paid'], 2) }}</span>
-                      </div>
-                    </td>
+            <input type="number"
+                min="1"
+                max="{{ $group->groupMembers->count() }}"
+                wire:model.defer="membersOrder.{{ $member['id'] }}"
+                class="mt-1 w-full border dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded p-2 text-center">
+          
+          </span></li>
 
-                      <td class="size-px whitespace-nowrap">
-                      <div class="px-6 py-3">
+        </ul>
 
-                          @if($member['is_paid'])
-                      
-                         <span class="text-sm text-gray-800 dark:text-gray-100">Amechangiwa</span>
-                    @else
-                      
-                         <span class="text-sm text-gray-800 dark:text-gray-100">Bado Hajachangiwa</span>
-                    @endif
-                       
-                      </div>
-
-                        
-
-                           <td class="size-px whitespace-nowrap">
-                      <div class="px-6 py-3">
-                        <span class="block text-sm font-semibold text-gray-800 dark:text-gray-200">{{ $member['pay_date'] }}</span>
-                      </div>
-                    </td>
-
-                    </td>
-                    <td class="size-px whitespace-nowrap">
-                      <div class="px-6 py-1.5">
-                          <button type="button"
-                            wire:click="openPaymentModal({{ $member['id'] }})"
-                            class="bg-green-600 text-white px-2 py-1 rounded"
-                            @if($memberToPay->id != $member['id']) disabled @endif>
-                        Pay Member
-                    </button>
-                      </div>
-                    </td>
-                  </tr>
-
-                  
-
-                 
-                 @endforeach
-                
-                </tbody>
-              </table>
+         <div class="mt-6">
+                <h3 class="text-sm font-semibold text-gray-800 mb-2">📎 changia member:</h3>
+                <div class="flex flex-col gap-2 text-sm">
 
 
- @if($showPaymentModal && $memberToPay)
+
+                  @if($showPaymentModal && $memberToPay)
 <div class="fixed inset-0 flex items-center justify-center z-50 bg-black/60 backdrop-blur-sm p-4">
 
     <button
@@ -344,45 +238,35 @@
     </div>
 </div>
 @endif
-
-   <button type="submit"
-                        class="mt-4 bg-blue-600 dark:bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-700 dark:hover:bg-blue-600 transition">
-                    Save Order
-                </button>
-            </form>
-        @endif
-              <!-- End Table -->
-
-              <!-- Footer -->
-              <div class="px-6 py-4 grid gap-3 md:flex md:justify-between md:items-center border-t border-gray-200 dark:border-gray-700">
-                <div>
-                  <p class="text-sm text-gray-600 dark:text-gray-400">
-                    <span class="font-semibold text-gray-800 dark:text-gray-200">12</span> results
-                  </p>
+                
+                                                 
+<button type="button"
+                wire:click="openPaymentModal({{ $member['id'] }})"
+                class="bg-green-600 text-white px-3 py-2 rounded-lg text-sm hover:bg-green-700 transition">
+                Pay Member
+            </button>
+                         
+                         
+                  
                 </div>
-
-                <div>
-                  <div class="inline-flex gap-x-2">
-                    <button type="button" class="py-1.5 px-2 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-gray-200 bg-white text-gray-800 shadow-2xs hover:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none focus:outline-hidden focus:bg-gray-50 dark:bg-transparent dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800 dark:focus:bg-gray-800">
-                      <svg class="shrink-0 size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="m15 18-6-6 6-6" />
-                      </svg>
-                      Prev
-                    </button>
-
-                    <button type="button" class="py-1.5 px-2 inline-flex items-center gap-x-2 text-sm font-medium rounded-lg border border-gray-200 bg-white text-gray-800 shadow-2xs hover:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none focus:outline-hidden focus:bg-gray-50 dark:bg-transparent dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800 dark:focus:bg-gray-800">
-                      Next
-                      <svg class="shrink-0 size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="m9 18 6-6-6-6" />
-                      </svg>
-                    </button>
-                  </div>
-                </div>
-              </div>
-              <!-- End Footer -->
             </div>
-          </div>
-        </div>
+        
+      </div>
+    </div>
+    </div>
+    </div>
+
+@endforeach
+</div>
+
+   
+    <div class="w-full text-center">
+      <button type="button" wire:click="saveOrder" class="rounded-lg border border-gray-200 bg-white px-5 py-2.5 text-sm font-medium text-gray-900 hover:bg-gray-100 hover:text-primary-700 focus:z-10 focus:outline-none focus:ring-4 focus:ring-gray-100 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white dark:focus:ring-gray-700">Save Order</button>
+    </div>
+  </div>
+  
+
+</section>
       </div>
 
 

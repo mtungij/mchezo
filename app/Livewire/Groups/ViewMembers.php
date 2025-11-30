@@ -19,6 +19,10 @@ public $remainingAmount;
     public $showPaymentModal = false; 
     public $totalMembers;
 
+  public $search = '';
+    public $filterStatus = 'all'; // <-- Declare this property
+
+
     public function mount($group)
     {
         $this->group = Group::with('groupMembers.user')->findOrFail($group);
@@ -140,7 +144,7 @@ public function processPayment()
     $groupName = $this->group->name;
 
 
-    dd($groupName);
+    // dd($groupName);
 
     // Total amount this receiver must get
     $totalMembers = $this->group->groupMembers->count();
@@ -155,24 +159,24 @@ public function processPayment()
     $remainingFormatted = number_format($remainingForMember, 0);
 
     // ====== SMS kwa anayepokea ======
-    $messageReceiver = "Ndugu {$receiver->name}, umepokea malipo ya Tsh {$amount} kutoka kwa {$payer->name} kupitia kikundi cha {$groupName}.";
+    // $messageReceiver = "Ndugu {$receiver->name}, umepokea malipo ya Tsh {$amount} kutoka kwa {$payer->name} kupitia kikundi cha {$groupName}.";
 
-    if ($remainingForMember > 0) {
-        $messageReceiver .= " Bado Tsh {$remainingFormatted} kukamilisha malipo yako.";
-    } else {
-        $messageReceiver .= " Hongera! Umekamilishiwa malipo yako yote.";
-    }
+    // if ($remainingForMember > 0) {
+    //     $messageReceiver .= " Bado Tsh {$remainingFormatted} kukamilisha malipo yako.";
+    // } else {
+    //     $messageReceiver .= " Hongera! Umekamilishiwa malipo yako yote.";
+    // }
 
-    $this->sendsms($receiver->phone, $messageReceiver);
+    // $this->sendsms($receiver->phone, $messageReceiver);
 
     // ====== SMS kwa anayelipa ======
-    $messagePayer = "Ndugu {$payer->name}, umelipa Tsh {$amount} kwa {$receiver->name} kupitia kikundi cha {$groupName}.";
+    // $messagePayer = "Ndugu {$payer->name}, umelipa Tsh {$amount} kwa {$receiver->name} kupitia kikundi cha {$groupName}.";
 
-    if ($remainingForMember > 0) {
-        $messagePayer .= " Bado {$receiver->name} anahitaji Tsh {$remainingFormatted} ili kumaliza malipo.";
-    }
+    // if ($remainingForMember > 0) {
+    //     $messagePayer .= " Bado {$receiver->name} anahitaji Tsh {$remainingFormatted} ili kumaliza malipo.";
+    // }
 
-    $this->sendsms($payer->phone, $messagePayer);
+    // $this->sendsms($payer->phone, $messagePayer);
 
     // ====== SMS kwa Group Admin ======
     // Chagua admin hapa:
@@ -366,63 +370,62 @@ public function setNextMemberToPay()
 
 
 
-public function getPayoutSchedule()
-{
-    $schedule = [];
-    $members = $this->group->groupMembers->sortBy('order_position');
+ public function getPayoutSchedule()
+    {
+        $schedule = [];
+        $members = $this->group->groupMembers->sortBy('order_position');
 
-    foreach ($members as $member) {
-        $startDate = \Carbon\Carbon::parse($this->group->start_date);
-        $interval = $this->group->interval;
+        foreach ($members as $member) {
+            $startDate = \Carbon\Carbon::parse($this->group->start_date);
+            $interval = $this->group->interval;
 
-        // Hesabu payout date
-        switch ($this->group->frequency_type) {
-            case 'day':
-                $payDate = $startDate->copy()->addDays($interval * $member->order_position);
-                break;
-            case 'week':
-                $payDate = $startDate->copy()->addWeeks($interval * $member->order_position);
-                break;
-            case 'month':
-                $payDate = $startDate->copy()->addMonths($interval * $member->order_position);
-                break;
-            default:
-                $payDate = $startDate->copy();
+            switch ($this->group->frequency_type) {
+                case 'day':
+                    $payDate = $startDate->copy()->addDays($interval * $member->order_position);
+                    break;
+                case 'week':
+                    $payDate = $startDate->copy()->addWeeks($interval * $member->order_position);
+                    break;
+                case 'month':
+                    $payDate = $startDate->copy()->addMonths($interval * $member->order_position);
+                    break;
+                default:
+                    $payDate = $startDate->copy();
+            }
+
+            $totalMembers = $this->group->groupMembers->count();
+            $amount = $this->group->contribution_amount * $interval * $totalMembers;
+
+            $amountPaid = Payment::where('group_id', $this->group->id)
+                ->where('member_id', $member->id)
+                ->sum('amount');
+
+            $isPaid = $amountPaid >= $amount;
+
+            $schedule[] = [
+                'id' => $member->id,
+                'order_position' => $member->order_position,
+                'name' => $member->user->name ?? '-',
+                'phone' => $member->user->phone ?? '-',
+                'passport' => $member->user->passport ?? null,
+                'login_code' => $member->user->login_code ?? '-',
+                'pay_date' => $payDate->format('Y-m-d'),
+                'amount_due' => $amount,
+                'amount_paid' => $amountPaid,
+                'is_paid' => $isPaid,
+            ];
         }
 
-        $totalMembers = $this->group->groupMembers->count();
-        $amount = $this->group->contribution_amount * $interval * $totalMembers;
-
-
-
-
-        // Kiasi kilicholipwa tayari
-        $amountPaid = Payment::where('group_id', $this->group->id)
-                        ->where('member_id', $member->id)
-                        ->sum('amount');
-
-        // Check if member is already fully paid
-        $isPaid = \App\Models\Payment::where('group_id', $this->group->id)
-                    ->where('member_id', $member->id)
-                    ->sum('amount') >= $amount;
-
-        $schedule[] = [
-            'id' => $member->id,
-            'order_position' => $member->order_position,
-            'name' => $member->user->name ?? '-',
-            'phone' => $member->user->phone ?? '-',
-            'passport' => $member->user->passport ?? null,
-            'login_code' => $member->user->login_code ?? '-',
-            'pay_date' => $payDate->format('Y-m-d'),
-            'amount_due' => $amount,
-            'amount_paid'=>$amountPaid,
-            'is_paid' => $isPaid,
-        ];
-    }
-
+        // 🔍 Search only
+        if (!empty($this->search)) {
+            $schedule = array_filter($schedule, function ($item) {
+                return str_contains(strtolower($item['name']), strtolower($this->search))
+                    || str_contains($item['phone'], $this->search)
+                    || str_contains($item['login_code'], $this->search);
+            });
+        }
     return $schedule;
 }
-
 
 
 
