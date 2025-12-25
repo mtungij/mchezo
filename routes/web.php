@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\RegisterInviteController;
 use App\Livewire\Settings\Appearance;
 use App\Livewire\Settings\Password;
 use App\Livewire\Settings\Profile;
@@ -21,7 +22,15 @@ Route::view('dashboard', 'dashboard')
     ->middleware(['auth', 'verified'])
     ->name('dashboard');
 
-Route::get('/invite/{code}', RegisterThroughInvite::class)->name('invite.register');
+Route::get('/invite/{code}',[RegisterInviteController::class , "index"])
+    ->name('invite.register')
+    ->middleware(['guest']);
+Route::post('/invite/register',[RegisterInviteController::class , "register"])->name('groups.invite.store');
+
+Route::get('/group-member/{code}', [RegisterInviteController::class , "showGroupMemberRegistered"])
+    ->name('group.member')
+    ->middleware(['auth', 'verified']);
+
 Route::get('/registration-success/{user}/{group}', [SuccessMessage::class, 'success'])->name('registration.success');
 
 

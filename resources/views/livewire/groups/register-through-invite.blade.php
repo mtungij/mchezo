@@ -1,3 +1,4 @@
+<x-layouts.auth>
 <div class="p-6 sm:p-8 max-w-lg mx-auto bg-white dark:bg-gray-900 shadow-lg rounded-2xl mt-10 relative">
 
     <h2 class="text-3xl sm:text-4xl font-bold mb-6 text-center text-gray-900 dark:text-gray-100">
@@ -42,12 +43,14 @@
 
     </div>
 
-    <form wire:submit.prevent="register" enctype="multipart/form-data" class="space-y-5 relative">
+    <form action="{{ route("groups.invite.store") }}" method="POST" enctype="multipart/form-data" class="space-y-5 relative">
+        @csrf
+        <input type="hidden" name="code" value="{{ $invite_code }}">
 
         <!-- Jina Kamili -->
         <div>
             <label class="block mb-2 font-semibold text-gray-800 dark:text-gray-200">Jina Kamili</label>
-            <input type="text" wire:model="name"
+            <input type="text" name="name"
                    class="w-full border rounded-lg p-3 bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-400 focus:outline-none transition"
                    placeholder="Andika jina lako kamili">
             @error('name') <span class="text-red-600 dark:text-red-400 text-sm mt-1 block">{{ $message }}</span> @enderror
@@ -56,38 +59,14 @@
         <!-- Namba ya Simu -->
         <div>
             <label class="block mb-2 font-semibold text-gray-800 dark:text-gray-200">Namba ya Simu</label>
-            <input type="text" wire:model="phone"
+            <input type="text" name="phone"
                    class="w-full border rounded-lg p-3 bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-400 focus:outline-none transition"
                    placeholder="Andika namba yako ya simu bila 0 mwanzo (mfano: 712345678)">
             @error('phone') <span class="text-red-600 dark:text-red-400 text-sm mt-1 block">{{ $message }}</span> @enderror
         </div>
 
         <!-- Picha ya Passport -->
-        <div>
-            <label class="block mb-2 font-semibold text-gray-800 dark:text-gray-200">Picha ya Passport</label>
-            <input type="file" wire:model="passport"
-                   accept="image/*" capture="user"
-                   class="w-full border rounded-lg p-3 bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100 cursor-pointer focus:ring-2 focus:ring-blue-400 focus:outline-none transition">
-            <p class="text-gray-500 dark:text-gray-400 text-sm mt-1">Chagua picha ya uso wako (camera ya mbele itafunguka kwenye simu).</p>
-            @error('passport') <span class="text-red-600 dark:text-red-400 text-sm mt-1 block">{{ $message }}</span> @enderror
-
-            <!-- Orodhesha & Thumbnail -->
-            @if ($passport)
-                <div class="mt-4 flex flex-col sm:flex-row items-center gap-4">
-                    <div>
-                        <p class="text-gray-700 dark:text-gray-200 mb-1 text-sm sm:text-base">Muonekano Kamili:</p>
-                        <img src="{{ $passport->temporaryUrl() }}" alt="Passport Preview" class="w-40 h-40 object-cover rounded-lg border shadow-sm">
-                    </div>
-                    <div>
-                        <p class="text-gray-700 dark:text-gray-200 mb-1 text-sm sm:text-base">Thumbnail:</p>
-                        @php
-                            $thumbnail = $passport->temporaryUrl();
-                        @endphp
-                        <img src="{{ $thumbnail }}" alt="Passport Thumbnail" class="w-20 h-20 object-cover rounded-lg border shadow-sm">
-                    </div>
-                </div>
-            @endif
-        </div>
+       
 
         <!-- Kitufe cha Kutuma -->
         <button type="submit"
@@ -118,3 +97,4 @@
     </div>
 
 </div>
+</x-layouts.auth>
