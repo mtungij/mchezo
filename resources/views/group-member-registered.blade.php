@@ -8,20 +8,55 @@
             </div>
         @endsession
         
-        <div class="max-w-lg mx-auto p-6 text-center rounded-lg shadow-md ">
-            <h1 class="text-2xl font-bold mb-4">Registration Successful!</h1>
-            <p class="mb-6">You have been successfully registered as a member of the group.</p>
-            <a href="{{ route('home') }}" class="inline-block bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
-                Go to Home
-            </a>
-        </div>
+      <!-- Parent wrapper must have dark class on <html> or <body> -->
+<div class="max-w-lg mx-auto p-8 text-center rounded-2xl shadow-xl
+            bg-gradient-to-br from-orange-400 via-orange-500 to-orange-600
+            dark:from-orange-700 dark:via-orange-800 dark:to-orange-900
+            text-white">
+
+    <h1 class="text-3xl font-extrabold mb-4">
+      Usajili Umefanikiwa
+    </h1>
+
+    <p class="mb-6 leading-relaxed text-white/95 dark:text-white/90">
+        Hongera <span class="font-semibold">{{ $user->name }}</span>, <br>
+        Umefanikiwa kujiunga na kikundi cha
+        <span class="font-semibold">{{ $group->name }}</span>.
+        <br><br>
+
+        <span class="block">
+            📞 Nambari ya simu:
+            <span class="font-semibold">{{ $user->phone }}</span>
+        </span>
+
+        <span class="block mt-2">
+            🔐 Login Code:
+            <span class="font-semibold">{{ $user->login_code }}</span>
+        </span>
+
+        <span class="block mt-4 text-sm text-white/90 dark:text-white/80">
+            Taarifa hizi ndizo utazitumia kuingia kwenye akaunti yako.
+        </span>
+    </p>
+
+    <a href="{{ route('home') }}"
+       class="inline-block px-6 py-3 rounded-full font-semibold shadow-md
+              bg-white text-orange-600
+              hover:bg-orange-100
+              dark:bg-gray-900 dark:text-orange-400
+              dark:hover:bg-gray-800
+              transition duration-300">
+        Go to Home
+    </a>
+</div>
+
 
         <div class="mt-8 text-center">
-            <h2 class="text-lg">
+            {{-- <h2 class="text-lg">
                 Group Imformation: {{ $group->name }} (ID: {{ $group->id }})    
-            </h2>
+            </h2> --}}
 
-        <h2 class="text-lg">
+        {{-- <h2 class="text-lg">
                 User Imformation: {{ $user->name }} (ID: {{ $user->id }})    
             </h2>
 
@@ -32,7 +67,7 @@
 
                   <h2 class="text-lg">
                 User Logincode: {{ $user->login_code }}    
-            </h2>
+            </h2> --}}
 
 </div>
 </x-layouts.app>

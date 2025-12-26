@@ -71,23 +71,25 @@ public function register(Request $request)
             'order_position' => $order,
         ]);
         // Use local format (starting with 0) for SMS readability
-        $localPhone = preg_replace('/^255/', '0', $user->phone);
+        $phon = preg_replace('/^255/', '0', $user->phone);
 
         $massage = "Ndugu {$user->name}, umejisajili kwenye kikundi cha {$group->name}. "
             . "Code yako ya kuingia ni: {$user->login_code}. "
             . "Kiasi cha kuchangia ni Tsh " . number_format($group->contribution_amount) . ". "
             . "Itunze code yako usishare na mtu yoyote.";
+
+            $phone = $formattedPhone;
     
-             
+           
     
         // Send SMS
-        $this->sendsms($localPhone, $massage);
+        $this->sendsms($phone, $massage);
 
         Auth::login($user);
 
         $request->session()->regenerate();
 
-        session()->flash('success', "Umejisajili kikamilifu. Login code: $user_logincode, PHONE: $localPhone");
+        session()->flash('success', "Umejisajili kikamilifu. Login code: $user_logincode, PHONE: $phone");
     });
  
 

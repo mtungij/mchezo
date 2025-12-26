@@ -44,6 +44,7 @@ Route::middleware(['auth'])->group(function () {
 
     
 Route::get('/groups/{group}/members', ViewMembers::class)->name('groups.members');
+Route::get('/groups/{group}/payments/pdf', [\App\Http\Controllers\PaymentController::class, 'downloadPdf'])->name('payments.pdf');
 
 Route::get('/groups', GroupsIndex::class)->name('groups.index');
 Route::get('/groups/join', GroupsIndex::class)->name('groups.join');

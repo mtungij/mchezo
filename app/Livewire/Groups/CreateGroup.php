@@ -68,6 +68,9 @@ public $interval = 1;
     $this->sendsms($phone, $massage);
 
     session()->flash('success', 'Group created successfully! Invite link is ready.');
+    
+    // Dispatch event to show modal
+    $this->dispatch('group-created');
 }
 
     public function render()

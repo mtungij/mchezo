@@ -18,6 +18,8 @@ public $remainingAmount;
     public $payerId;        
     public $showPaymentModal = false; 
     public $totalMembers;
+    public $keepPaymentModalOpen = false;
+    public $showPaymentsModal = false;
 
   public $search = '';
     public $filterStatus = 'all'; // <-- Declare this property
@@ -120,6 +122,7 @@ public function openPaymentModal($memberId)
 
     if (! $isOwner && ! $isDelegatedMember) {
         session()->flash('error', 'Ni mmiliki au aliyepewa ruhusa tu.');
+        $this->addError('payment', 'Ni mmiliki au aliyepewa ruhusa tu.');
         return;
     }
 
@@ -155,6 +158,27 @@ public function processPayment()
         return;
     }
 
+    // Basic validation
+    if (! $this->payerId) {
+        session()->flash('error', 'Tafadhali chagua anayelipa (payer).');
+        $this->addError('payerId', 'Tafadhali chagua anayelipa (payer).');
+        return;
+    }
+
+    if (! $this->paymentAmount || $this->paymentAmount <= 0) {
+        session()->flash('error', 'Weka kiasi sahihi cha kulipa.');
+        $this->addError('paymentAmount', 'Weka kiasi sahihi cha kulipa.');
+        return;
+    }
+
+    // Ensure payer is a member of this group
+    $payerMemberCheck = GroupMember::find($this->payerId);
+    if (! $payerMemberCheck || $payerMemberCheck->group_id !== $this->group->id) {
+        session()->flash('error', 'Mlipaji si mwanachama wa kikundi hiki.');
+        $this->addError('payerId', 'Mlipaji si mwanachama wa kikundi hiki.');
+        return;
+    }
+
     $alreadyPaid = Payment::where('group_id', $this->group->id)
         ->where('member_id', $this->memberToPay->id)
         ->where('payer_id', $this->payerId)
@@ -164,17 +188,24 @@ public function processPayment()
 
     if ($this->paymentAmount > $remaining) {
         session()->flash('error', 'Huwezi kulipa zaidi ya kiasi kilichobaki.');
+        $this->addError('paymentAmount', 'Huwezi kulipa zaidi ya kiasi kilichobaki.');
         return;
     }
 
     // Save payment
-    Payment::create([
-        'group_id' => $this->group->id,
-        'member_id' => $this->memberToPay->id,
-        'payer_id' => $this->payerId,
-        'amount' => $this->paymentAmount,
-        'paid_at' => now(),
-    ]);
+    try {
+        Payment::create([
+            'group_id' => $this->group->id,
+            'member_id' => $this->memberToPay->id,
+            'payer_id' => $this->payerId,
+            'amount' => $this->paymentAmount,
+            'paid_at' => now(),
+        ]);
+    } catch (\Throwable $e) {
+        session()->flash('error', 'Imeshindikana kuhifadhi malipo.');
+        $this->addError('payment', 'Imeshindikana kuhifadhi malipo.');
+        return;
+    }
 
     // If delegated member processed payment, revoke their delegation for today
     if ($isDelegatedMember) {
@@ -185,7 +216,9 @@ public function processPayment()
     // ============================
 
     $receiver = $this->memberToPay->user;
-    $payer = \App\Models\User::find($this->payerId);
+    // payerId is a GroupMember id (see migration), so resolve its user
+    $payerMember = GroupMember::find($this->payerId);
+    $payer = $payerMember?->user;
 
 
     // dd($payer);
@@ -234,7 +267,9 @@ public function processPayment()
     // au: $adminPhone = '255xxxxxxxxx';
 
     if ($adminPhone) {
-        $messageAdmin = "Payment Alert: {$payer->name} amelipa Tsh {$amount} kwa {$receiver->name} katika kikundi cha {$groupName}.";
+        $payerName = $payer->name ?? 'Mlipaji';
+        $receiverName = $receiver->name ?? 'Mpokeaji';
+        $messageAdmin = "Payment Alert: {$payerName} amelipa Tsh {$amount} kwa {$receiverName} katika kikundi cha {$groupName}.";
         
         if ($remainingForMember > 0) {
             $messageAdmin .= " Bado Tsh {$remainingFormatted} kumaliza malipo ya {$receiver->name}.";
@@ -247,16 +282,20 @@ public function processPayment()
 
     // ====== SMS kwa anayepokea ======
     if ($receiver && $receiver->phone) {
-        $messageReceiver = "Ndugu {$receiver->name}, umepokea malipo ya Tsh {$amount} kutoka kwa {$payer->name} kupitia kikundi cha {$groupName}.";
+        $payerName = $payer->name ?? 'mlipaji';
+        $receiverName = $receiver->name ?? 'mpokeaji';
+        $messageReceiver = "Ndugu {$receiverName}, umepokea malipo ya Tsh {$amount} kutoka kwa {$payerName} kupitia kikundi cha {$groupName}.";
 
         if ($remainingForMember > 0) {
             $messageReceiver .= " Bado Tsh {$remainingFormatted} kukamilisha malipo yako.";
         } else {
             $messageReceiver .= " Hongera! Umekamilishiwa malipo yako yote.";
         }
-
+$phone= $this->formatPhoneForSms($receiver->phone);
+$massage=$messageReceiver;
+// dd($phone,$massage);
         try {
-            $this->sendsms($this->formatPhoneForSms($receiver->phone), $messageReceiver);
+            $this->sendsms($phone, $massage);
         } catch (\Throwable $e) {
             // ignore SMS errors
         }
@@ -264,7 +303,9 @@ public function processPayment()
 
     // ====== SMS kwa anayelipa ======
     if ($payer && $payer->phone) {
-        $messagePayer = "Ndugu {$payer->name}, umelipa Tsh {$amount} kwa {$receiver->name} katika kikundi cha {$groupName}.";
+        $payerName = $payer->name ?? 'Mlipa';
+        $receiverName = $receiver->name ?? 'Mpokeaji';
+        $messagePayer = "Ndugu {$payerName}, umelipa Tsh {$amount} kwa {$receiverName} katika kikundi cha {$groupName}.";
 
         if ($remainingForMember > 0) {
             $messagePayer .= " Bado {$receiver->name} anahitaji Tsh {$remainingFormatted} ili kumaliza malipo.";
@@ -280,7 +321,15 @@ public function processPayment()
     session()->flash('success', 'Malipo yamehifadhiwa.');
 
     $this->reset('paymentAmount', 'payerId');
-    $this->setNextMemberToPay();
+
+    if ($this->keepPaymentModalOpen) {
+        // Keep the modal open on the same member to allow continued payments
+        $this->showPaymentModal = true;
+    } else {
+        // Advance to next member and close
+        $this->setNextMemberToPay();
+        $this->closePaymentModal();
+    }
 }
 
 
@@ -351,7 +400,7 @@ public function setNextMemberToPay()
   }
 
   /**
-   * Convert phone into local SMS-friendly form (e.g., 2557xxxx -> 07xxxx)
+   * Convert phone to international format with 255 prefix
    */
   private function formatPhoneForSms($phone)
   {
@@ -359,16 +408,19 @@ public function setNextMemberToPay()
       $p = preg_replace('/[^0-9+]/', '', $phone);
       $p = ltrim($p, '+');
 
-      if (str_starts_with($p, '255') && strlen($p) > 3) {
-          return '0' . substr($p, 3);
-      }
-
-      if (str_starts_with($p, '0')) {
+      // If already starts with 255, return as is
+      if (str_starts_with($p, '255') && strlen($p) >= 12) {
           return $p;
       }
 
+      // If starts with 0, convert to 255
+      if (str_starts_with($p, '0') && strlen($p) >= 10) {
+          return '255' . substr($p, 1);
+      }
+
+      // If 9 digits, add 255 prefix
       if (strlen($p) === 9) {
-          return '0' . $p;
+          return '255' . $p;
       }
 
       return $p;
@@ -536,6 +588,83 @@ public function setNextMemberToPay()
             return $schedule;
 }
 
+public function getUnpaidMembersProperty()
+{
+    $schedule = collect($this->getPayoutSchedule());
+
+    return $schedule
+        ->where('is_paid', false)
+        ->sortBy('order_position')
+        ->map(function ($item) {
+            $remaining = max(0, ($item['amount_due'] ?? 0) - ($item['amount_paid'] ?? 0));
+            return array_merge($item, [
+                'remaining' => $remaining,
+            ]);
+        })
+        ->values()
+        ->all();
+}
+
+public function getMyPayDateProperty()
+{
+    $member = $this->group->groupMembers->firstWhere('user_id', auth()->id());
+    if (! $member) {
+        return null;
+    }
+
+    $startDate = Carbon::parse($this->group->start_date);
+    $interval = $this->group->interval;
+
+    switch ($this->group->frequency_type) {
+        case 'day':
+            return $startDate->copy()->addDays($interval * $member->order_position)->format('Y-m-d');
+        case 'week':
+            return $startDate->copy()->addWeeks($interval * $member->order_position)->format('Y-m-d');
+        case 'month':
+            return $startDate->copy()->addMonths($interval * $member->order_position)->format('Y-m-d');
+        default:
+            return $startDate->format('Y-m-d');
+    }
+}
+
+public function getMyUnpaidPayersProperty()
+{
+    $member = $this->group->groupMembers->firstWhere('user_id', auth()->id());
+    if (! $member) {
+        return [];
+    }
+
+    // Only show on the member's payout date
+    $payDate = Carbon::parse($this->myPayDate);
+    if (! $payDate->isSameDay(now())) {
+        return [];
+    }
+
+    $perMemberAmount = $this->group->contribution_amount * $this->group->interval; // each payer owes this to receiver
+
+    return $this->group->groupMembers
+        ->where('id', '!=', $member->id)
+        ->map(function ($payer) use ($member, $perMemberAmount) {
+            $paid = Payment::where('group_id', $this->group->id)
+                ->where('member_id', $member->id)
+                ->where('payer_id', $payer->id)
+                ->sum('amount');
+
+            $remaining = max(0, $perMemberAmount - $paid);
+
+            return [
+                'payer_member_id' => $payer->id,
+                'name' => $payer->user->name ?? '-',
+                'phone' => $payer->user->phone ?? '-',
+                'remaining' => $remaining,
+            ];
+        })
+        ->filter(fn ($row) => $row['remaining'] > 0)
+        ->sortBy('name')
+        ->values()
+        ->all();
+}
+
 public function getMembersStatsProperty()
 {
     $schedule = $this->getPayoutSchedule();
@@ -630,5 +759,61 @@ public function revokePaymentRights($memberId)
     public function render()
     {
         return view('livewire.groups.view-members');
+    }
+
+    // Open/Close modal for payments list
+    public function openPaymentsModal()
+    {
+        $this->showPaymentsModal = true;
+    }
+
+    public function closePaymentsModal()
+    {
+        $this->showPaymentsModal = false;
+    }
+
+    // Payments summary for current group
+    public function getPaymentsSummaryProperty()
+    {
+        $rows = [];
+        $payments = Payment::where('group_id', $this->group->id)
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        foreach ($payments as $p) {
+            $payerMember = GroupMember::find($p->payer_id);
+            $receiverMember = GroupMember::find($p->member_id);
+
+            // Compute scheduled contribution date for the receiver
+            $startDate = \Carbon\Carbon::parse($this->group->start_date);
+            $interval = $this->group->interval;
+            $payDate = $startDate->copy();
+            switch ($this->group->frequency_type) {
+                case 'day':
+                    $payDate = $startDate->copy()->addDays($interval * ($receiverMember->order_position ?? 0));
+                    break;
+                case 'week':
+                    $payDate = $startDate->copy()->addWeeks($interval * ($receiverMember->order_position ?? 0));
+                    break;
+                case 'month':
+                    $payDate = $startDate->copy()->addMonths($interval * ($receiverMember->order_position ?? 0));
+                    break;
+            }
+
+            $rows[] = [
+                'payer' => $payerMember?->user?->name ?? '-',
+                'receiver' => $receiverMember?->user?->name ?? '-',
+                'amount' => $p->amount,
+                // Show actual payment date/time
+                'date' => optional($p->created_at)->format('d M, Y H:i'),
+            ];
+        }
+
+        return $rows;
+    }
+
+    public function getPaymentsTotalProperty()
+    {
+        return Payment::where('group_id', $this->group->id)->sum('amount');
     }
 }
