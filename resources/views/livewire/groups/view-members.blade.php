@@ -43,6 +43,27 @@
 
 </div>
 
+@php $stats = $this->membersStats; @endphp
+
+<div class="grid grid-cols-1 sm:grid-cols-4 gap-3 mb-4">
+  <div class="p-3 bg-white rounded-lg shadow-sm text-center dark:bg-gray-800">
+    <div class="text-sm text-gray-500 dark:text-gray-400">Jumla Wanachama</div>
+    <div class="text-2xl font-bold text-gray-900 dark:text-white">{{ $stats['total'] }}</div>
+  </div>
+  <div class="p-3 bg-white rounded-lg shadow-sm text-center dark:bg-gray-800">
+    <div class="text-sm text-gray-500 dark:text-gray-400">Wamelipwa</div>
+    <div class="text-2xl font-bold text-green-600 dark:text-green-400">{{ $stats['paid'] }}</div>
+  </div>
+  <div class="p-3 bg-white rounded-lg shadow-sm text-center dark:bg-gray-800">
+    <div class="text-sm text-gray-500 dark:text-gray-400">Hawajalipwa</div>
+    <div class="text-2xl font-bold text-red-600 dark:text-red-400">{{ $stats['not_paid'] }}</div>
+  </div>
+  <div class="p-3 bg-white rounded-lg shadow-sm text-center dark:bg-gray-800">
+    <div class="text-sm text-gray-500 dark:text-gray-400">Tarehe Mwisho</div>
+    <div class="text-2xl font-bold text-gray-900 dark:text-white">{{ $stats['end_date'] ? \Carbon\Carbon::parse($stats['end_date'])->format('d M, Y') : '-' }}</div>
+  </div>
+</div>
+
 
 
 <!-- CARD GRID -->
@@ -61,7 +82,7 @@
   <div class="w-full sm:w-full md:w-full lg:w-auto mb-4">
 
 
-     <div class="bg-white p-4 border-t-4 border-green-500 rounded-lg shadow-md w-full h-auto">
+     <div class="bg-white p-4 border-t-4 border-green-500 rounded-lg shadow-md w-full h-auto dark:bg-gray-800 dark:border-green-400 dark:text-gray-100">
 
     <div class="w-32 h-32 mx-auto rounded-full overflow-hidden border-4 border-green-400">
     <img src="{{ $member['passport'] ? asset('storage/' . $member['passport']) : asset('assets/images/user.png') }}"
@@ -73,7 +94,7 @@
     {{ $member['name'] }}
         </h1>
         {{-- <h2 class="text-sm text-green-500 text-center font-semibold">memberToPay-?id</h2> --}}
-        <p class="text-center mt-2 text-gray-800 font-medium">{{ $member['phone'] }}</p>
+        <p class="text-center mt-2 text-gray-800 font-medium dark:text-gray-200">{{ $member['phone'] }}</p>
 
         {{-- <div class="mt-4 text-center">
   <a href="" 
@@ -83,7 +104,7 @@
 </div> --}}
 
      <div class="mt-4 text-center">
-  <a class="font-semibold {{ $member['is_paid'] ? 'inline-flex items-center px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-semibold rounded-lg shadow-md transition-all' : 'inline-flex items-center px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-semibold rounded-lg shadow-md transition-all' }}">
+  <a class="font-semibold {{ $member['is_paid'] ? 'inline-flex items-center px-4 py-2 bg-green-600 hover:bg-green-700 dark:bg-green-500 dark:hover:bg-green-600 text-white text-sm font-semibold rounded-lg shadow-md transition-all' : 'inline-flex items-center px-4 py-2 bg-red-600 hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600 text-white text-sm font-semibold rounded-lg shadow-md transition-all' }}">
                     {{ $member['is_paid'] ? 'Amechangiwa' : 'Bado Hajachangiwa' }}
  </a>
 </div>
@@ -126,11 +147,15 @@
            
           <li class="flex items-center justify-between py-2 px-3 font-bold text-base"><span>Badilisha Mpangilio</span><span>
             
+            @if(auth()->id() === $this->group->owner_id)
             <input type="number"
                 min="1"
                 max="{{ $group->groupMembers->count() }}"
                 wire:model.defer="membersOrder.{{ $member['id'] }}"
-                class="mt-1 w-full border dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded p-2 text-center">
+                class="mt-1 w-20 border dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 rounded-md px-2 py-1 text-center shadow-sm" />
+            @else
+            <span class="text-sm">Only owner can change order</span>
+            @endif
           
           </span></li>
 
@@ -240,11 +265,35 @@
 @endif
                 
                                                  
-<button type="button"
-                wire:click="openPaymentModal({{ $member['id'] }})"
-                class="bg-green-600 text-white px-3 py-2 rounded-lg text-sm hover:bg-green-700 transition">
-                Pay Member
+@php $today = now()->format('Y-m-d'); @endphp
+
+<div class="mt-4 flex flex-col items-center gap-3">
+    <div class="flex items-center gap-2">
+        @if(auth()->id() === $this->group->owner_id || (auth()->id() === $member['user_id'] && $member['can_pay'] && $member['can_pay_until'] === $today))
+            <button type="button" wire:click="openPaymentModal({{ $member['id'] }})" class="inline-flex items-center gap-2 px-3 py-2 rounded-md text-sm font-semibold bg-green-600 text-white hover:bg-green-700 dark:bg-green-500 dark:hover:bg-green-600 shadow transition" title="Pay Member" aria-label="Pay Member">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H9a2 2 0 00-2 2v2M7 9v6a2 2 0 002 2h6a2 2 0 002-2V9M16 13a1 1 0 11-2 0 1 1 0 012 0z" />
+                </svg>
+                <span>Pay Member</span>
             </button>
+        @endif
+
+        @if(auth()->id() === $this->group->owner_id && $member['pay_date'] === $today)
+            <button wire:click="togglePaymentRights({{ $member['id'] }})"
+                    title="{{ $member['can_pay'] && $member['can_pay_until'] === $today ? 'Ondoa Ruhusa' : 'Ruhusu' }}"
+                    aria-label="{{ $member['can_pay'] && $member['can_pay_until'] === $today ? 'Ondoa Ruhusa' : 'Ruhusu' }}"
+                    class="px-3 py-2 rounded-md bg-cyan-600 text-gray-950 font-medium transition-shadow focus:outline-none focus:ring-2 focus:ring-offset-1 {{ $member['can_pay'] && $member['can_pay_until'] === $today ? 'bg-yellow-500 text-white hover:bg-yellow-600 focus:ring-yellow-300' : 'bg-indigo-600 text-white hover:bg-indigo-700 focus:ring-indigo-300' }}">
+                {{ $member['can_pay'] && $member['can_pay_until'] === $today ? 'Ondoa Ruhusa' : 'Ruhusu' }}
+            </button>
+        @endif
+    </div>
+
+    @if($member['can_pay'] && $member['can_pay_until'] === $today)
+        <div class="text-xs inline-flex items-center gap-1 px-2 py-1 bg-cyan-50 text-cyan-800 rounded-full font-semibold dark:bg-cyan-900 dark:text-cyan-200 ring-1 ring-cyan-100 dark:ring-cyan-700">Ana ruhusa leo</div>
+    @endif
+</div>
+
+
                          
                          
                   
@@ -261,7 +310,11 @@
 
    
     <div class="w-full text-center">
-      <button type="button" wire:click="saveOrder" class="rounded-lg border border-gray-200 bg-white px-5 py-2.5 text-sm font-medium text-gray-900 hover:bg-gray-100 hover:text-primary-700 focus:z-10 focus:outline-none focus:ring-4 focus:ring-gray-100 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white dark:focus:ring-gray-700">Save Order</button>
+      @if(auth()->id() === $this->group->owner_id)
+      <button type="button" wire:click="saveOrder" class="rounded-md bg-cyan-600 text-white px-6 py-2 text-sm font-semibold shadow hover:bg-cyan-700 transition">Save Order</button>
+      @else
+      <div class="text-sm text-gray-500 dark:text-gray-400">Ni mmiliki wa kikundi tu anayeweza kuhifadhi mpangilio.</div>
+      @endif
     </div>
   </div>
   

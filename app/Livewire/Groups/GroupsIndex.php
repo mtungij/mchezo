@@ -12,8 +12,15 @@ class GroupsIndex extends Component
     public function mount()
     {
         // Get all groups owned by admin
-        $this->groups = Group::where('owner_id', auth()->id())->get();
+      $this->groups = Group::where('owner_id', auth()->id())->get();
+      $this->groups = Group::whereHas('members', function ($query) {
+        $query->where('user_id', auth()->id());
+      })->get();
+
+    
     }
+
+   
 
     public function render()
     {

@@ -16,7 +16,6 @@ class RegisterInviteController extends Controller
     public function index($code)
     {
         $group = Group::with('members')->where('invite_code', $code)->firstOrFail();
-        // dd($group, $code);
         return view("livewire.groups.register-through-invite", [
             'invite_code' => $code,
             'group' => $group,
@@ -53,6 +52,7 @@ public function register(Request $request)
     
         $user = User::create([
             'name' => $validated['name'],
+            // store formatted phone (255...), but we'll send the local phone in SMS
             'phone' => $formattedPhone,
             'email' => $formattedPhone.'@example.com',
             'role'=>"member",
@@ -70,24 +70,24 @@ public function register(Request $request)
             'user_id' => $user->id,
             'order_position' => $order,
         ]);
-        $phone = $user->phone;
-    
-    
-         $massage = "Ndugu {$user->name}, umejisajili kwenye kikundi cha {$group->name}. "
-             . "Code yako ya kuingia ni: {$user->login_code}. "
-             . "Kiasi cha kuchangia ni Tsh ".number_format($group->contribution_amount, ).". "
-             . "Itunze code yako usishare na mtu yoyote.";
+        // Use local format (starting with 0) for SMS readability
+        $localPhone = preg_replace('/^255/', '0', $user->phone);
+
+        $massage = "Ndugu {$user->name}, umejisajili kwenye kikundi cha {$group->name}. "
+            . "Code yako ya kuingia ni: {$user->login_code}. "
+            . "Kiasi cha kuchangia ni Tsh " . number_format($group->contribution_amount) . ". "
+            . "Itunze code yako usishare na mtu yoyote.";
     
              
     
         // Send SMS
-        $this->sendsms($phone, $massage);
+        $this->sendsms($localPhone, $massage);
 
         Auth::login($user);
 
         $request->session()->regenerate();
 
-        session()->flash("success', 'Umejisajili kikamilifu. Login code: $user_logincode, PHONE: $user->phone");
+        session()->flash('success', "Umejisajili kikamilifu. Login code: $user_logincode, PHONE: $localPhone");
     });
  
 
@@ -97,20 +97,20 @@ public function register(Request $request)
 
     private function formatPhone($phone)
 {
-    // Ondoa whitespaces
-    $phone = trim($phone);
+    // Trim and remove non-digits
+    $phone = preg_replace('/\D+/', '', trim($phone));
 
-    // Kama inaanza na +255, rudisha bila kubadili
-    if (Str::startsWith($phone, '255')) {
-        return $phone;
-    }
-
-    // Kama inaanza na 0 (mfano 0712...)
+    // If it starts with 0 (0712...), convert to 2557...
     if (Str::startsWith($phone, '0')) {
         return '255' . substr($phone, 1);
     }
 
-    // Kama mwanzo si 0 wala +255, assume ni 7xxxx au 6xxxx
+    // If it already starts with 255, keep as-is
+    if (Str::startsWith($phone, '255')) {
+        return $phone;
+    }
+
+    // Otherwise assume it's missing leading 255 and prefix it
     return '255' . $phone;
 }
 

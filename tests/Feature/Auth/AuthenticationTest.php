@@ -10,11 +10,52 @@ test('login screen can be rendered', function () {
 });
 
 test('users can authenticate using the login screen', function () {
-    $user = User::factory()->withoutTwoFactor()->create();
+    $user = User::factory()->withoutTwoFactor()->create(['phone' => '255712345678']);
 
     $response = $this->post(route('login.store'), [
-        'email' => $user->email,
+        'phone' => '0712345678',
         'password' => 'password',
+    ]);
+
+    $response
+        ->assertSessionHasNoErrors()
+        ->assertRedirect(route('dashboard', absolute: false));
+
+    $this->assertAuthenticated();
+});
+
+test('admins can authenticate using login_code', function () {
+    $admin = User::factory()->withoutTwoFactor()->create([
+        'phone' => '255712345679',
+        'role' => 'admin',
+        'login_code' => 'ADMINCODE123',
+        'password' => bcrypt('secret123'),
+    ]);
+
+    $response = $this->post(route('login.store'), [
+        'phone' => '0712345679',
+        'password' => 'ADMINCODE123',
+    ]);
+
+    $response
+        ->assertSessionHasNoErrors()
+        ->assertRedirect(route('dashboard', absolute: false));
+
+    $this->assertAuthenticated();
+});
+
+
+test('members can authenticate using login_code', function () {
+    $member = User::factory()->withoutTwoFactor()->create([
+        'phone' => '255712345680',
+        'role' => 'member',
+        'login_code' => 'MEMBER1234',
+        'password' => bcrypt('secret123'),
+    ]);
+
+    $response = $this->post(route('login.store'), [
+        'phone' => '0712345680',
+        'password' => 'MEMBER1234',
     ]);
 
     $response
@@ -28,11 +69,11 @@ test('users can not authenticate with invalid password', function () {
     $user = User::factory()->create();
 
     $response = $this->post(route('login.store'), [
-        'email' => $user->email,
+        'phone' => '0712345678',
         'password' => 'wrong-password',
     ]);
 
-    $response->assertSessionHasErrorsIn('email');
+    $response->assertSessionHasErrorsIn('phone');
 
     $this->assertGuest();
 });

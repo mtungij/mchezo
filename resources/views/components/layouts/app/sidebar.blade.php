@@ -31,22 +31,25 @@
         href="{{ route('groups.create') }}" 
         class="hover:bg-cyan-50 hover:text-cyan-600 rounded-lg"
     >
-        Create Groups Name
+        Tengeneza Group
     </flux:sidebar.item>
 
     <flux:sidebar.item 
         href="{{ route('groups.index') }}" 
         class="hover:bg-cyan-50 hover:text-cyan-600 rounded-lg"
     >
-        Groups list
+       Orodha ya Vikundi Vyangu
     </flux:sidebar.item>
 
-    <flux:sidebar.item 
-        href="#" 
+
+      {{-- <flux:sidebar.item 
+        href="{{ route('groups.join') }}" 
         class="hover:bg-cyan-50 hover:text-cyan-600 rounded-lg"
     >
-        Brand guidelines
-    </flux:sidebar.item>
+         Join Groups
+    </flux:sidebar.item> --}}
+
+ 
 </flux:sidebar.group>
 
 

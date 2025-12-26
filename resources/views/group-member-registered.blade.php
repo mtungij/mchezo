@@ -23,7 +23,16 @@
 
         <h2 class="text-lg">
                 User Imformation: {{ $user->name }} (ID: {{ $user->id }})    
-            </h2>div>
+            </h2>
+
+                  <h2 class="text-lg">
+                User Phone: {{ $user->phone }}    
+            </h2>
+
+
+                  <h2 class="text-lg">
+                User Logincode: {{ $user->login_code }}    
+            </h2>
 
 </div>
 </x-layouts.app>

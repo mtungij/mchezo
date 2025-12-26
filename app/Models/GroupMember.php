@@ -10,6 +10,13 @@ class GroupMember extends Model
         'group_id',
         'user_id',
         'order_position',
+        'can_pay',
+        'can_pay_until',
+    ];
+
+    protected $casts = [
+        'can_pay' => 'boolean',
+        'can_pay_until' => 'date',
     ];
 
     public function group()

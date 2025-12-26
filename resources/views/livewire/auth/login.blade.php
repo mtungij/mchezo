@@ -9,7 +9,7 @@
         <!-- Header -->
         <x-auth-header 
             :title="__('Log in to your account')" 
-            :description="__('Enter your email and password below to log in')" 
+            :description="__('Enter your phone and password below to log in')" 
         />
 
         <!-- Session Status -->
@@ -22,18 +22,19 @@
         <form method="POST" action="{{ route('login.store') }}" class="flex flex-col gap-6 w-full">
             @csrf
 
-            <!-- Email Address -->
+            <!-- Phone Number -->
             <flux:input 
                 class="w-full text-sm sm:text-base md:text-lg bg-transparent border-none rounded focus:outline-none focus:ring-2 focus:ring-cyan-500 hover:ring-cyan-400 transition-all duration-200 px-3 py-2 sm:py-3 placeholder-gray-500 dark:placeholder-gray-400"
-                name="email"
-                :label="__('Email address')"
-                :value="old('email')"
-                type="email"
+                name="phone"
+                :label="__('Phone number')"
+                :value="old('phone')"
+                type="tel"
                 required
                 autofocus
-                autocomplete="email"
-                placeholder="email@example.com"
+                autocomplete="tel"
+                placeholder="0712345678"
             />
+            <div class="text-xs text-gray-500 mt-1">Please enter your phone starting with <strong>06</strong> or <strong>07</strong> (e.g. 0712345678).</div>
 
             <!-- Password -->
             <div class="relative w-full">

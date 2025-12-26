@@ -46,6 +46,7 @@ Route::middleware(['auth'])->group(function () {
 Route::get('/groups/{group}/members', ViewMembers::class)->name('groups.members');
 
 Route::get('/groups', GroupsIndex::class)->name('groups.index');
+Route::get('/groups/join', GroupsIndex::class)->name('groups.join');
 
 Route::middleware(['auth'])->group(function() {
     Route::get('/groups/create', CreateGroup::class)->name('groups.create');

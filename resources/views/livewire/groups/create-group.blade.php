@@ -3,7 +3,7 @@
 
     <!-- Title -->
     <h2 class="text-2xl font-bold mb-6 text-left text-gray-900 dark:text-gray-100">
-        Create New Group
+        Tengeneza Kikundi Kipya
     </h2>
 
     @if(session()->has('success'))
@@ -18,7 +18,7 @@
         <!-- Group Name -->
         <div>
             <label class="block mb-1 font-semibold text-gray-700 dark:text-gray-200">
-                Group Name
+                Jina la Kikundi
             </label>
 
             <div class="relative">
@@ -39,7 +39,7 @@
         <!-- Description -->
         <div class="lg:col-span-2">
             <label class="block mb-1 font-semibold text-gray-700 dark:text-gray-200">
-                Description (Optional)
+                Maelezo ya Kikundi (sio la)
             </label>
 
             <textarea wire:model="description"
@@ -155,7 +155,7 @@
 
         <div x-data="{ copied: false }" class="mt-6 p-4 bg-gray-100 dark:bg-gray-800 rounded-lg space-y-3">
     <p class="font-semibold text-gray-900 dark:text-gray-100">
-        Invite Link:
+        :
     </p>
 
     <input type="text"

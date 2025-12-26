@@ -29,6 +29,10 @@ class User extends Authenticatable
         'login_code',
     ];
 
+    protected $casts = [
+        'login_code' => 'string',
+    ];
+
     /**
      * The attributes that should be hidden for serialization.
      *
